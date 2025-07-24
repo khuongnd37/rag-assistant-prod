@@ -1,0 +1,30 @@
+name: Build and Push All Images
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log in to VCR (VNG Cloud Registry)
+        run: echo "${{ secrets.VCR_PASSWORD }}" | docker login vcr.vngcloud.vn -u "${{ secrets.VCR_USERNAME }}" --password-stdin
+
+      - name: Build & Push app image
+        run: |
+          docker build -t vcr.vngcloud.vn/107444-rover-11/app:latest ./app
+          docker push vcr.vngcloud.vn/107444-rover-11/app:latest
+
+      - name: Build & Push embedding-service image
+        run: |
+          docker build -t vcr.vngcloud.vn/107444-rover-11/embedding:latest ./embedding-service
+          docker push vcr.vngcloud.vn/107444-rover-11/embedding:latest
+
+      - name: Build & Push streamlit-app image
+        run: |
+          docker build -t vcr.vngcloud.vn/107444-rover-11/streamlit:latest ./streamlit-app
+          docker push vcr.vngcloud.vn/107444-rover-11/streamlit:latest
